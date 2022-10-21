@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Past;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -19,6 +21,7 @@ import static io.getarrays.server.enumeration.Status.SERVER_UP;
 import static java.time.LocalDateTime.now;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.*;
 
 @RestController
 @RequestMapping("/server")
@@ -45,7 +48,7 @@ public class ServerRessource {
                 Response.builder()
                         .timeStamp(now())
                         .data(Map.of("server", server))
-                        .message(server.getStatus() ==  SERVER_UP ? "Ping Success" : "Ping failed")
+                        .message(server.getStatut()==  SERVER_UP ? "Ping Success" : "Ping failed")
                         .status(OK)
                         .statusCode(OK.value())
                         .build()
@@ -73,13 +76,12 @@ public class ServerRessource {
 
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<Response> getServer(@PathVariable("ipAddress")String ipAddress) throws IOException {
-        Server server =serverService.ping(ipAddress);
-        return ResponseEntity.ok(
+    public ResponseEntity<Response> getServer(@PathVariable("id") Long id){
+                return ResponseEntity.ok(
                 Response.builder()
                         .timeStamp(now())
-                        .data(Map.of("server", server))
-                        .message(server.getStatus() ==  SERVER_UP ? "Ping Success" : "Ping failed")
+                        .data(Map.of("server", serverService.get(id)))
+                        .message("server retreived")
                         .status(OK)
                         .statusCode(OK.value())
                         .build()
@@ -87,5 +89,28 @@ public class ServerRessource {
 
     }
 
+
+
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Response> deleteServer(@PathVariable("id") Long id){
+        return ResponseEntity.ok(
+                Response.builder()
+                        .timeStamp(now())
+                        .data(Map.of("deleted", serverService.delete(id)))
+                        .message("server deleted")
+                        .status(OK)
+                        .statusCode(OK.value())
+                        .build()
+        );
+
+    }
+
+
+    @GetMapping(path="/images/{filename}",produces = IMAGE_PNG_VALUE)
+    public byte[] getServerImage (@PathVariable("filename") String filename) throws IOException {
+        return Files.readAllBytes(Paths.get(System.getProperty("user")+" D:/SPRING.BOOT-PROJECTS/server/images" + filename));
+
+    }
 
 }
