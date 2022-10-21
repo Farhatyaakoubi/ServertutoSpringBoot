@@ -7,6 +7,7 @@ import io.getarrays.server.repo.ServerRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,6 +18,7 @@ import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Random;
 
+import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor
@@ -47,8 +49,12 @@ private final ServerRepo serverRepo;
     @Override
     public Collection<Server> List(int Limit) {
         log.info("Fetching all servers");
-        return serverRepo.findAll(PageRequest.of( page : 0, Limit)).toList();
+        return serverRepo.findAll(PageRequest.of(0 , Limit)).toList();
+
+
     }
+        /*return serverRepo.findAll(PageRequest.of( page : 0 ,Limit)).toList();*/
+
 
     @Override
     public Server get(Long id) {
@@ -66,11 +72,11 @@ private final ServerRepo serverRepo;
     public boolean delete(Long id) {
         log.info("Deleting  server by ID : {}",id);
         serverRepo.deleteById(id);
-        return Boolean.TRUE;
+        return TRUE;
     }
 
     private String setServerImageUrl() {
-        String[] imageNames = {"s1.jpg","s2.jpg","s3.jpg","s4.jpg"};
+        String[] imageNames = {"s1.png","s2.png","s3.png","s4.png"};
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("/server/images" + imageNames [new Random().nextInt(4)]).toUriString();
     }
 }
